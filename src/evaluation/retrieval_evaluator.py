@@ -1,5 +1,5 @@
 from typing import List, Tuple
-from ..rag import search_documents, search_documents_semantic, search_documents_hybrid, Document
+from ..rag import search_documents_keyword, search_documents_semantic, search_documents_hybrid, Document
 
 
 # Evaluation dataset: (query, expected_document_title)
@@ -82,7 +82,7 @@ def evaluate_retrievers(k: int = 3, verbose: bool = True) -> None:
     print("[KEYWORD RETRIEVER]")
     print("="*70)
     keyword_recall = calculate_recall_at_k(
-        queries, expected_titles, search_documents, k=k, verbose=verbose
+        queries, expected_titles, search_documents_keyword, k=k, verbose=verbose
     )
     print(f"\nRecall@{k}: {keyword_recall:.2f}")
     

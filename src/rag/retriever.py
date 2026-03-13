@@ -59,7 +59,7 @@ def tokenize(text: str) -> Set[str]:
     return set(re.findall(r"\w+", text.lower()))
 
 
-def search_documents(query: str, top_k: int = 3) -> List[Document]:
+def search_documents_keyword(query: str, top_k: int = 3) -> List[Document]:
     """
     Cerca documenti rilevanti usando keyword matching.
     

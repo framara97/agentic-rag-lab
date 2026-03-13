@@ -1,5 +1,5 @@
 from typing import List
-from .retriever import search_documents, Document
+from .retriever import search_documents_keyword, Document
 from ..llm import BedrockLLM
 
 
@@ -80,7 +80,7 @@ Answer:"""
             La risposta generata dal modello
         """
         # 1. Recupera documenti rilevanti
-        documents = search_documents(query, top_k=self.top_k)
+        documents = search_documents_keyword(query, top_k=self.top_k)
         
         if not documents:
             return "No relevant documents found."

@@ -1,4 +1,4 @@
-from ..rag.retriever import search_documents
+from ..rag.retriever import search_documents_keyword
 
 
 def search_documents_tool(query: str, top_k: int = 3) -> str:
@@ -15,7 +15,7 @@ def search_documents_tool(query: str, top_k: int = 3) -> str:
     Returns:
         Stringa formattata con i documenti trovati
     """
-    documents = search_documents(query, top_k=top_k)
+    documents = search_documents_keyword(query, top_k=top_k)
     
     if not documents:
         return "No relevant documents found for the query."

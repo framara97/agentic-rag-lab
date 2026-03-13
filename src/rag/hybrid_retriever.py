@@ -1,6 +1,6 @@
 from typing import List, Dict
 from collections import defaultdict
-from .retriever import search_documents, Document
+from .retriever import search_documents_keyword, Document
 from .embedding_retriever import search_documents_semantic
 
 
@@ -66,7 +66,7 @@ def search_documents_hybrid(query: str, top_k: int = 3) -> List[Document]:
     # Recuperiamo più documenti (top_k * 2) per avere più candidati da fondere
     retrieval_k = max(top_k * 2, 5)
     
-    keyword_docs = search_documents(query, top_k=retrieval_k)
+    keyword_docs = search_documents_keyword(query, top_k=retrieval_k)
     semantic_docs = search_documents_semantic(query, top_k=retrieval_k)
     
     # Combina usando RRF

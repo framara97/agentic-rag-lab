@@ -1,4 +1,4 @@
-from src.rag import search_documents, search_documents_semantic, search_documents_hybrid
+from src.rag import search_documents_keyword, search_documents_semantic, search_documents_hybrid
 from src.evaluation import evaluate_retrievers
 
 
@@ -21,7 +21,7 @@ def main():
         
         # Keyword retrieval
         print("\n[KEYWORD RETRIEVAL]")
-        keyword_docs = search_documents(query, top_k=3)
+        keyword_docs = search_documents_keyword(query, top_k=3)
         print(f"  Found: {len(keyword_docs)} documents")
         if keyword_docs:
             for j, doc in enumerate(keyword_docs, 1):
