@@ -1,4 +1,4 @@
-from ..rag.retriever import search_documents_keyword
+from ..rag.keyword_retriever import search_documents_keyword
 
 
 def search_documents_tool(query: str, top_k: int = 3) -> str:

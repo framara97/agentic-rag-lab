@@ -1,7 +1,7 @@
 from typing import List, Dict
 from collections import defaultdict
-from .retriever import search_documents_keyword, Document
-from .embedding_retriever import search_documents_semantic
+from .keyword_retriever import search_documents_keyword, Document
+from .semantic_retriever import search_documents_semantic
 
 
 def reciprocal_rank_fusion(

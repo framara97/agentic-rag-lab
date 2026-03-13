@@ -1,7 +1,7 @@
 import numpy as np
 from typing import List
 from sentence_transformers import SentenceTransformer
-from .retriever import Document, SAMPLE_DOCUMENTS
+from .keyword_retriever import Document, SAMPLE_DOCUMENTS
 
 
 class EmbeddingRetriever:

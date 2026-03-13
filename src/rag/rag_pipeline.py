@@ -1,5 +1,5 @@
 from typing import List
-from .retriever import search_documents_keyword, Document
+from .keyword_retriever import search_documents_keyword, Document
 from ..llm import BedrockLLM
 
 
