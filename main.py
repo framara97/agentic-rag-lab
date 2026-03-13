@@ -1,10 +1,10 @@
-from src.rag import search_documents, search_documents_semantic
+from src.rag import search_documents, search_documents_semantic, search_documents_hybrid
 from src.evaluation import evaluate_retrievers
 
 
 def main():
     print("="*70)
-    print("Confronto Keyword Retrieval vs Semantic Retrieval")
+    print("Confronto Keyword vs Semantic vs Hybrid Retrieval")
     print("="*70)
     
     # Query di test
@@ -34,6 +34,13 @@ def main():
         semantic_docs = search_documents_semantic(query, top_k=3)
         print(f"  Found: {len(semantic_docs)} documents")
         for j, doc in enumerate(semantic_docs, 1):
+            print(f"  {j}. {doc.title}")
+        
+        # Hybrid retrieval
+        print("\n[HYBRID RETRIEVAL (RRF)]")
+        hybrid_docs = search_documents_hybrid(query, top_k=3)
+        print(f"  Found: {len(hybrid_docs)} documents")
+        for j, doc in enumerate(hybrid_docs, 1):
             print(f"  {j}. {doc.title}")
         
         print()

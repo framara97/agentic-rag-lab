@@ -1,5 +1,5 @@
 from typing import List, Tuple
-from ..rag import search_documents, search_documents_semantic, Document
+from ..rag import search_documents, search_documents_semantic, search_documents_hybrid, Document
 
 
 # Evaluation dataset: (query, expected_document_title)
@@ -61,7 +61,7 @@ def calculate_recall_at_k(
 
 def evaluate_retrievers(k: int = 3, verbose: bool = True) -> None:
     """
-    Valuta e confronta keyword retriever e semantic retriever.
+    Valuta e confronta keyword, semantic e hybrid retriever.
     
     Args:
         k: Numero di documenti da recuperare per il calcolo di Recall@k
@@ -95,16 +95,28 @@ def evaluate_retrievers(k: int = 3, verbose: bool = True) -> None:
     )
     print(f"\nRecall@{k}: {semantic_recall:.2f}")
     
+    # Valuta hybrid retriever
+    print("\n" + "="*70)
+    print("[HYBRID RETRIEVER (RRF)]")
+    print("="*70)
+    hybrid_recall = calculate_recall_at_k(
+        queries, expected_titles, search_documents_hybrid, k=k, verbose=verbose
+    )
+    print(f"\nRecall@{k}: {hybrid_recall:.2f}")
+    
     # Confronto
     print("\n" + "="*70)
     print("COMPARISON")
     print("="*70)
-    improvement = semantic_recall - keyword_recall
-    print(f"Semantic retriever improvement: {improvement:+.2f}")
+    print(f"Keyword:  {keyword_recall:.2f}")
+    print(f"Semantic: {semantic_recall:.2f}")
+    print(f"Hybrid:   {hybrid_recall:.2f}")
     
-    if semantic_recall > keyword_recall:
-        print("✓ Semantic retriever performs better")
-    elif semantic_recall < keyword_recall:
-        print("✓ Keyword retriever performs better")
+    # Determina il migliore
+    best_recall = max(keyword_recall, semantic_recall, hybrid_recall)
+    if hybrid_recall == best_recall:
+        print("\n✓ Hybrid retriever performs best")
+    elif semantic_recall == best_recall:
+        print("\n✓ Semantic retriever performs best")
     else:
-        print("= Both retrievers perform equally")
+        print("\n✓ Keyword retriever performs best")
