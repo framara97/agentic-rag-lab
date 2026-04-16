@@ -1,13 +1,12 @@
 import re
-from dataclasses import dataclass
-from typing import List, Set
+from pydantic import BaseModel
 
 
-@dataclass
-class Document:
+class Document(BaseModel):
     """Rappresenta un documento con titolo e testo."""
     title: str
     text: str
+    source: str = "unknown"  # Fonte del documento (opzionale)
 
 
 # Documenti di esempio sul tema Agentic RAG e AI
@@ -46,7 +45,7 @@ SAMPLE_DOCUMENTS = [
 ]
 
 
-def tokenize(text: str) -> Set[str]:
+def tokenize(text: str) -> set[str]:
     """
     Tokenizza il testo estraendo le parole e rimuovendo la punteggiatura.
     
@@ -54,12 +53,12 @@ def tokenize(text: str) -> Set[str]:
         text: Il testo da tokenizzare
         
     Returns:
-        Set di token in lowercase
+        set di token in lowercase
     """
     return set(re.findall(r"\w+", text.lower()))
 
 
-def search_documents_keyword(query: str, top_k: int = 3) -> List[Document]:
+def search_documents_keyword(query: str, top_k: int = 3) -> list[Document]:
     """
     Cerca documenti rilevanti usando keyword matching.
     
@@ -68,7 +67,7 @@ def search_documents_keyword(query: str, top_k: int = 3) -> List[Document]:
         top_k: Numero massimo di documenti da restituire
         
     Returns:
-        Lista di documenti ordinati per rilevanza
+        lista di documenti ordinati per rilevanza
     """
     query_terms = tokenize(query)
     

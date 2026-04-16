@@ -1,4 +1,3 @@
-from typing import List, Tuple
 from ..rag import search_documents_keyword, search_documents_semantic, search_documents_hybrid, Document
 
 
@@ -16,8 +15,8 @@ EVAL_DATASET = [
 
 
 def calculate_recall_at_k(
-    queries: List[str],
-    expected_titles: List[str],
+    queries: list[str],
+    expected_titles: list[str],
     retriever_func,
     k: int = 3,
     verbose: bool = False
@@ -26,8 +25,8 @@ def calculate_recall_at_k(
     Calcola Recall@k per un retriever.
     
     Args:
-        queries: Lista di query
-        expected_titles: Lista di titoli attesi (uno per query)
+        queries: lista di query
+        expected_titles: lista di titoli attesi (uno per query)
         retriever_func: Funzione di retrieval da testare
         k: Numero di documenti da recuperare
         verbose: Se True, stampa i risultati per ogni query

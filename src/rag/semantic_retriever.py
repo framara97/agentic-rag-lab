@@ -1,5 +1,4 @@
 import numpy as np
-from typing import List
 from sentence_transformers import SentenceTransformer
 from .keyword_retriever import Document, SAMPLE_DOCUMENTS
 
@@ -57,7 +56,7 @@ class EmbeddingRetriever:
         
         return similarities
     
-    def search(self, query: str, top_k: int = 3) -> List[Document]:
+    def search(self, query: str, top_k: int = 3) -> list[Document]:
         """
         Cerca documenti rilevanti usando semantic similarity.
         
@@ -66,7 +65,7 @@ class EmbeddingRetriever:
             top_k: Numero massimo di documenti da restituire
             
         Returns:
-            Lista di documenti ordinati per similarità semantica
+            lista di documenti ordinati per similarità semantica
         """
         # Calcola embedding della query
         query_embedding = self.model.encode(query, convert_to_numpy=True)
@@ -85,7 +84,7 @@ class EmbeddingRetriever:
 SEMANTIC_RETRIEVER = EmbeddingRetriever()
 
 
-def search_documents_semantic(query: str, top_k: int = 3) -> List[Document]:
+def search_documents_semantic(query: str, top_k: int = 3) -> list[Document]:
     """
     Funzione helper per cercare documenti usando semantic retrieval.
     
@@ -97,6 +96,6 @@ def search_documents_semantic(query: str, top_k: int = 3) -> List[Document]:
         top_k: Numero massimo di documenti da restituire
         
     Returns:
-        Lista di documenti ordinati per similarità semantica
+        lista di documenti ordinati per similarità semantica
     """
     return SEMANTIC_RETRIEVER.search(query, top_k=top_k)

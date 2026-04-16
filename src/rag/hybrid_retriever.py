@@ -1,14 +1,13 @@
-from typing import List, Dict
 from collections import defaultdict
 from .keyword_retriever import search_documents_keyword, Document
 from .semantic_retriever import search_documents_semantic
 
 
 def reciprocal_rank_fusion(
-    keyword_docs: List[Document],
-    semantic_docs: List[Document],
+    keyword_docs: list[Document],
+    semantic_docs: list[Document],
     k: int = 60
-) -> List[Document]:
+) -> list[Document]:
     """
     Combina i risultati di due retriever usando Reciprocal Rank Fusion (RRF).
     
@@ -24,10 +23,10 @@ def reciprocal_rank_fusion(
         Lista di documenti ordinati per score RRF
     """
     # Dizionario per aggregare gli score: {document_title: score}
-    doc_scores: Dict[str, float] = defaultdict(float)
+    doc_scores: dict[str, float] = defaultdict(float)
     
     # Dizionario per mantenere i documenti: {document_title: Document}
-    doc_map: Dict[str, Document] = {}
+    doc_map: dict[str, Document] = {}
     
     # Calcola score RRF per keyword retriever
     for rank, doc in enumerate(keyword_docs, start=1):

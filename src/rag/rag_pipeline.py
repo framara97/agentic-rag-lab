@@ -1,4 +1,3 @@
-from typing import List
 from .keyword_retriever import search_documents_keyword, Document
 from ..llm import BedrockLLM
 
@@ -29,12 +28,12 @@ class RAGPipeline:
         )
         self.top_k = top_k
     
-    def _build_context(self, documents: List[Document]) -> str:
+    def _build_context(self, documents: list[Document]) -> str:
         """
         Costruisce il contesto dai documenti recuperati.
         
         Args:
-            documents: Lista di documenti
+            documents: lista di documenti
             
         Returns:
             Stringa formattata con il contesto
