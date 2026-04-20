@@ -1,6 +1,6 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+This file provides guidance to Claude Code when working with this repository.
 
 ## Setup
 
@@ -10,64 +10,77 @@ source venv/bin/activate
 pip install -r requirements.txt
 ```
 
-AWS credentials are required. The code defaults to the `personal` AWS profile in region `eu-west-1`. Set `AWS_PROFILE` if using a different profile.
+AWS credentials required. Defaults to `personal` AWS profile in `eu-west-1`.
+Override with `AWS_PROFILE=your-profile`.
 
-## Running the system
+## Commands
 
-There are no top-level entrypoint scripts — run via Python's `-c` flag or a REPL:
+```bash
+# Run tests
+pytest tests/ -v
 
-```python
-# Simple RAG agent (keyword search only)
-from src.agents import RAGAgent
-agent = RAGAgent()
-print(agent.answer("What is Agentic RAG?"))
+# Run retrieval comparison + evaluation
+python main.py
 
-# Router agent (selects best retrieval strategy per query)
-from src.agents import RetrievalRouterAgent
-agent = RetrievalRouterAgent()
-print(agent.retrieve("How does Amazon Bedrock support RAG?"))
-
-# Classic RAG pipeline (no Strands, direct Bedrock call)
-from src.rag import RAGPipeline
-pipeline = RAGPipeline()
-print(pipeline.answer_query("What are vector databases?"))
-
-# Evaluate all three retrievers
-from src.evaluation.retrieval_evaluator import evaluate_retrievers
-evaluate_retrievers(k=3, verbose=True)
+# Quick REPL usage — see examples below
+python -c "from src.agents import RAGAgent; print(RAGAgent().answer('What is RAG?'))"
 ```
+
+**⚠️ First import of `semantic_retriever` downloads ~90MB model** (`all-MiniLM-L6-v2`).
+This happens automatically via the `SEMANTIC_RETRIEVER` singleton at module load time.
+Do not move or lazy-load this singleton without understanding the downstream impact on hybrid retrieval.
 
 ## Architecture
 
-The system has two parallel query paths:
+Two parallel query paths:
 
-**1. Classic RAG pipeline** (`src/rag/rag_pipeline.py`): synchronous retrieve → prompt → generate. Uses `BedrockLLM` (`src/llm/bedrock_client.py`) which calls `bedrock-runtime` directly via boto3.
+**1. Classic RAG** (`src/rag/rag_pipeline.py`): retrieve → prompt → generate.
+Uses `BedrockLLM` (`src/llm/bedrock_client.py`) via boto3 directly.
 
-**2. Agentic RAG** (`src/agents/`): the LLM decides when and how to retrieve. Built on [Strands Agents](https://github.com/strands-agents/sdk-python). The agent receives retrieval tools wrapped with the `@tool` decorator and reasons about which to call.
+**2. Agentic RAG** (`src/agents/`): LLM decides when/how to retrieve.
+Built on [Strands Agents](https://github.com/strands-agents/sdk-python).
+
+<important if="modifying retrieval layer or corpus documents">
+`keyword_retriever.py` is the single source of truth for the corpus.
+Do NOT define or modify documents elsewhere.
+</important>
+
+<important if="refactoring imports or moving modules">
+`SEMANTIC_RETRIEVER` singleton downloads ~90MB model at import time.
+Do not move or lazy-load without understanding downstream impact.
+</important>
 
 ### Retrieval layer (`src/rag/`)
 
-Three retrieval strategies share the same in-memory `SAMPLE_DOCUMENTS` corpus (defined in `keyword_retriever.py`):
+All three retrievers share `SAMPLE_DOCUMENTS` from `keyword_retriever.py`.
 
-- **Keyword** (`keyword_retriever.py`): token intersection scoring with title bonus weights.
-- **Semantic** (`semantic_retriever.py`): cosine similarity over sentence-transformer embeddings (`all-MiniLM-L6-v2`). A global `SEMANTIC_RETRIEVER` singleton is loaded at import time — importing this module downloads/loads the model.
-- **Hybrid** (`hybrid_retriever.py`): combines keyword + semantic results via Reciprocal Rank Fusion (RRF, k=60).
+> **⚠️ Critical:** `keyword_retriever.py` is the single source of truth for the corpus.
+> Do NOT define or modify documents elsewhere.
+
+| Retriever | File | Strategy |
+|---|---|---|
+| Keyword | `keyword_retriever.py` | Token intersection + title bonus |
+| Semantic | `semantic_retriever.py` | Cosine similarity over sentence-transformer embeddings |
+| Hybrid | `hybrid_retriever.py` | RRF fusion of keyword + semantic (k=60) |
 
 ### Agent layer (`src/agents/`)
 
-- **`RAGAgent`**: single tool (`search_documents`) backed by keyword retrieval. The agent decides whether to call it.
-- **`RetrievalRouterAgent`**: three tools (`keyword_search`, `semantic_search`, `hybrid_search`). The agent routes each query to the most appropriate strategy based on the system prompt's routing rules. Returns retrieved documents only — no final answer generation.
-
-### Tool bridge (`src/tools/search_tool.py`)
-
-Thin wrapper used by `RAGAgent` to adapt the keyword retriever into a Strands-compatible tool format.
+- **`RAGAgent`**: single tool (`search_documents`), keyword-backed.
+- **`RetrievalRouterAgent`**: three tools, routes per query type. Returns documents only — no answer generation.
 
 ### Evaluation (`src/evaluation/retrieval_evaluator.py`)
 
-`evaluate_retrievers()` runs an 8-query dataset against all three retrievers and reports `Recall@k` for each, then prints a comparison.
+`evaluate_retrievers()` runs 8 queries, reports `Recall@k` per retriever.
 
-## Key design notes
+## Known issues / migration state
 
-- The `Document` dataclass and `SAMPLE_DOCUMENTS` corpus live in `keyword_retriever.py` and are imported by the other retrievers — this file is the single source of truth for the corpus.
-- Bedrock model default: `eu.anthropic.claude-3-7-sonnet-20250219-v1:0` (EU cross-region inference profile).
-- Strands agent debug logging is enabled by default in `rag_agent.py`; set `logging.getLogger("strands").setLevel(logging.WARNING)` to silence it.
+- `rag_pipeline.py` and `semantic_retriever.py` still use `print()` — structured logging not yet implemented (roadmap: Fase 1)
+- `hybrid_retriever.py` has a latent bug: `List[Document]` annotation without import — use built-in `list[Document]` (Python 3.10+)
+- Strands agent debug logging enabled by default in `rag_agent.py` — set `logging.getLogger("strands").setLevel(logging.WARNING)` to silence
+
+## Bedrock config
+
+Default model: `eu.anthropic.claude-3-7-sonnet-20250219-v1:0` (EU cross-region inference profile).
+
+## Lessons
+@.claude/lessons.md
