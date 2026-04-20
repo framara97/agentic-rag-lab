@@ -47,7 +47,7 @@ def reciprocal_rank_fusion(
     return [doc_map[title] for title, _ in sorted_titles]
 
 
-def search_documents_hybrid(query: str, top_k: int = 3) -> List[Document]:
+def search_documents_hybrid(query: str, top_k: int = 3) -> list[Document]:
     """
     Cerca documenti usando hybrid retrieval (keyword + semantic).
     
